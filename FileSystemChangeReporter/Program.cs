@@ -12,8 +12,14 @@ namespace FileSystemChangeReporter
     {
         public static ConcurrentQueue<string> myFileQueue = new ConcurrentQueue<string>();
 
-        static void Main(string[] args)
+		private static string searchPattern = null;
+
+		static void Main(string[] args)
         {
+			if (args.Length == 1)
+			{
+				searchPattern = args[0];
+			}
             var drives = DriveInfo.GetDrives();
             foreach (var drive in drives.Where(drive => drive.IsReady))
             {
@@ -65,14 +71,20 @@ namespace FileSystemChangeReporter
 
         private static void OnChanged(object source, FileSystemEventArgs e)
         {
-            var message = $"File: {e.FullPath} {e.ChangeType}";
-            myFileQueue.Enqueue(message);
+			if (searchPattern == null || e.FullPath.Contains(searchPattern))
+			{
+				var message = $"File: {e.FullPath} {e.ChangeType}";
+				myFileQueue.Enqueue(message);
+			}
         }
 
         private static void OnRenamed(object source, RenamedEventArgs e)
         {
-            var message = $"File: {e.OldFullPath} renamed to {e.FullPath}";
-            myFileQueue.Enqueue(message);
+			if (searchPattern == null || e.OldFullPath.Contains(searchPattern) || e.FullPath.Contains(searchPattern))
+			{
+				var message = $"File: {e.OldFullPath} renamed to {e.FullPath}";
+				myFileQueue.Enqueue(message);
+			}
         }
     }
 }
