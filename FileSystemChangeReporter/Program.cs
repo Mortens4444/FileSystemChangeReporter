@@ -71,7 +71,7 @@ namespace FileSystemChangeReporter
 
         private static void OnChanged(object source, FileSystemEventArgs e)
         {
-			if (searchPattern == null || e.FullPath.Contains(searchPattern))
+			if (searchPattern == null || e.FullPath.Contains(searchPattern) || String.Equals(e.ChangeType.ToString(), searchPattern, StringComparison.OrdinalIgnoreCase))
 			{
 				var message = $"File: {e.FullPath} {e.ChangeType}";
 				myFileQueue.Enqueue(message);
